@@ -1,36 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# The Boring News
 
-## Getting Started
+> "Boring software is software that works."
 
-First, run the development server:
+**The Boring News** is a minimalist, developer-focused tech news aggregator designed to cut through the noise. It automatically curates, summarizes, and categorizes technology updates from trusted engineering sources, presenting them in a clean, distraction-free interface.
 
+## 🏗 System Design & Architecture
+
+The system follows a modern, server-centric architecture optimized for performance and maintainability.
+
+### Core Architecture
+- **Framework**: [Next.js 15 (App Router)](https://nextjs.org/)
+- **Database**: [SQLite](https://sqlite.org/) via [Prisma ORM](https://www.prisma.io/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **Language**: TypeScript
+
+### Key Components
+
+1.  **Ingestion Engine**
+    - Runs as a background process (`scripts/test-ingest.ts`).
+    - Fetches RSS feeds from configured sources (e.g., engineering blogs, news outlets).
+    - Parses content, deduplicates articles based on URL, and strictly links back to the original source.
+    - Stores structured metadata (Title, Summary, Source, Category) in the SQLite database.
+
+2.  **Frontend Interface**
+    - **Server Components**: The main feed uses React Server Components for efficient data fetching.
+    - **Client Interactivity**:
+        - `StaggeredMenu`: A GSAP/Framer powered navigation menu.
+        - `Balatro`: An interactive WebGL background shader (OGL) for visual depth.
+        - `NewsCard`: Optimized masonry-style cards with `next/image` for performance.
+    - **SEO & Metadata**: Automatic sitemap generation, `robots.txt`, and rich Open Graph/Twitter Card metadata for social sharing.
+
+3.  **Caching Strategy (ISR)**
+    - The application uses **Incremental Static Regeneration**.
+    - The home page revalidates every **60 seconds**. This ensures the database is not hammered on every request while keeping news reasonably fresh.
+
+## 🛠 Tech Stack
+
+- **Frontend**: Next.js 16, React 19, Tailwind CSS v4, Lucide React
+- **Animation/WebGL**: GSAP, OGL (for the `Balatro` background)
+- **Backend/Data**: Server Actions, Prisma, SQLite, RSS Parser
+- **Utilities**: `date-fns` (time formatting), `clsx`/`tailwind-merge` (class handling)
+
+## 🚀 Getting Started
+
+Follow these steps to run the project locally.
+
+### Prerequisites
+- Node.js 18+ installed.
+
+### 1. Clone the repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/boring-news.git
+cd boring-news
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install Dependencies
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Setup the Database
+Initialize the SQLite database and generate the Prisma client.
+```bash
+npx prisma db push
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+*(Optional) Seed the database if a seed script exists:*
+```bash
+npx prisma db seed
+```
 
-## Learn More
+### 4. Run the Development Server
+Start the Next.js app.
+```bash
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000) to view the site.
 
-To learn more about Next.js, take a look at the following resources:
+### 5. Ingest News
+To populate the database with real news, run the ingestion script in a separate terminal window:
+```bash
+npx tsx scripts/test-ingest.ts
+```
+*Note: In a production environment, this would be a scheduled Cron job.*
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🔒 Security & Performance
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Headers**: Strict security headers (HSTS, Anti-clickjacking) are enforced via `next.config.ts`.
+- **Images**: Remote images are optimized and lazy-loaded via `next/image`.
+- **Type Safety**: Full end-to-end type safety with Prisma generated types.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+© The Boring Project. Engineered to be dull.
+# The-Boring-News
