@@ -73,6 +73,7 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} ${roboto.variable} ${boldonse.variable} antialiased`}
       >
+        <Analytics />
         {children}
       </body>
     </html>
