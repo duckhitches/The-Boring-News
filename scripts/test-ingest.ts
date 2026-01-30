@@ -1,4 +1,6 @@
 
+
+import 'dotenv/config';
 import { ingestAllFeeds } from '../lib/ingestor';
 
 async function test() {

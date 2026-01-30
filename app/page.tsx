@@ -1,12 +1,20 @@
 import { getArticles } from '@/lib/actions';
 import { Header } from '@/components/Header';
 import { ArticleFeed } from '@/components/ArticleFeed';
+import { Search } from '@/components/Search';
 import Balatro from '@/components/Balatro';
 
 export const revalidate = 60; // Revalidate every 60 seconds (ISR) for better performance
 
-export default async function Home() {
-  const { articles } = await getArticles({ limit: 30 }); // Initial load
+type Props = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export default async function Home(props: Props) {
+  const searchParams = await props.searchParams;
+  const search = typeof searchParams.search === 'string' ? searchParams.search : undefined;
+  
+  const { articles } = await getArticles({ limit: 30, search }); // Initial load
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black font-sans text-zinc-900 dark:text-zinc-100 relative">
@@ -22,20 +30,25 @@ export default async function Home() {
       <div className="relative z-10">
         <Header />
         
-        <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold font-boldonse text-white tracking-tight mb-2">Detailed Tech News</h1>
-          <p className="text-white dark:text-white">
-            Curated technology updates from trusted sources.
-          </p>
+        <main id='hero' className="container mx-auto px-4 py-8">
+        <div className="mb-8 flex flex-col md:flex-row items-start md:items-end justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold font-boldonse text-white tracking-tight mb-2">Detailed Tech News</h1>
+            <p className="text-white dark:text-white">
+              Curated technology updates from trusted sources.
+            </p>
+          </div>
+          <Search />
         </div>
 
         {articles.length === 0 ? (
            <div className="text-center py-20">
-             <p className="text-xl text-zinc-500">No news articles found. Try triggering ingestion.</p>
+             <p className="text-xl text-zinc-500">
+               {search ? `No articles found for "${search}"` : "No news articles found. Try triggering ingestion."}
+             </p>
            </div>
         ) : (
-          <ArticleFeed initialArticles={articles} />
+          <ArticleFeed initialArticles={articles} search={search} />
         )}
       </main>
 

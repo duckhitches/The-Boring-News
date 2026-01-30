@@ -68,6 +68,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Boldonse&display=swap" rel="stylesheet"   />
       </head>
       <body
+        suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} ${roboto.variable} ${boldonse.variable} antialiased`}
       >
         {children}

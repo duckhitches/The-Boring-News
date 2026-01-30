@@ -1,89 +1,145 @@
 'use server';
 
-import { xano } from './xano';
+import { sql } from '@/lib/db';
 
-export type Article = {
+export interface ArticleWithSource {
     id: string;
     title: string;
-    summary?: string;
-    shortSummary?: string;
-    extendedSummary?: string;
+    summary: string | null;
+    shortSummary: string | null;
+    extendedSummary: string | null;
     url: string;
-    image?: string;
-    author?: string;
-    publishedAt: string;
-    sourceId: string;
-    source: Source;
-    categories: Category[];
-    createdAt: string;
-};
-
-export type Source = {
-    id: string;
-    name: string;
-    feedUrl: string;
-    websiteUrl?: string;
-    enabled: boolean;
-    createdAt: string;
-    updatedAt: string;
-};
-
-export type Category = {
-    id: string;
-    name: string;
-};
-
-export type ArticleWithRelations = Article;
-
-export type GetArticlesResponse = {
-    articles: ArticleWithRelations[];
-    metadata: {
-        total: number;
-        page: number;
-        totalPages: number;
+    image: string | null;
+    author: string | null;
+    publishedAt: Date;
+    source: {
+        id: string;
+        name: string;
+        websiteUrl: string | null;
     };
-};
+    categories: {
+        id: string;
+        name: string;
+    }[];
+}
 
-export async function getArticles({
-    page = 1,
-    limit = 20,
-    categoryId,
-}: {
-    page?: number;
+export type ArticleWithRelations = ArticleWithSource;
+
+export interface GetArticlesParams {
     limit?: number;
-    categoryId?: string;
-}): Promise<GetArticlesResponse> {
-    const offset = (page - 1) * limit;
+    offset?: number;
+    category?: string;
+    search?: string;
+}
+
+export interface GetArticlesResult {
+    articles: ArticleWithSource[];
+    hasMore: boolean;
+}
+
+export async function getArticles(
+    params: GetArticlesParams = {}
+): Promise<GetArticlesResult> {
+    const { limit = 30, offset = 0, category, search } = params;
+    const searchPattern = search ? `%${search}%` : null;
 
     try {
-        const articles = await xano.getArticles({
-            limit,
-            offset,
-            category: categoryId,
-        });
+        let query;
+        if (category) {
+            // optimized query for category filtering
+            query = await sql`
+                SELECT 
+                    a.id,
+                    a.title,
+                    a.summary,
+                    a.short_summary as "shortSummary",
+                    a.extended_summary as "extendedSummary",
+                    a.url,
+                    a.image,
+                    a.author,
+                    a.published_at as "publishedAt",
+                    json_build_object(
+                        'id', s.id,
+                        'name', s.name,
+                        'websiteUrl', s.website_url
+                    ) as source,
+                    COALESCE(
+                        json_agg(
+                            json_build_object('id', c.id, 'name', c.name)
+                        ) FILTER (WHERE c.id IS NOT NULL),
+                        '[]'
+                    ) as categories
+                FROM articles a
+                JOIN sources s ON a.source_id = s.id
+                LEFT JOIN article_categories ac ON a.id = ac.article_id
+                LEFT JOIN categories c ON ac.category_id = c.id
+                WHERE a.id IN (
+                    SELECT a2.id 
+                    FROM articles a2
+                    JOIN article_categories ac2 ON a2.id = ac2.article_id
+                    JOIN categories c2 ON ac2.category_id = c2.id
+                    WHERE c2.name = ${category}
+                )
+                AND (${searchPattern}::text IS NULL OR (a.title ILIKE ${searchPattern} OR a.summary ILIKE ${searchPattern}))
+                GROUP BY a.id, s.id
+                ORDER BY a.published_at DESC
+                LIMIT ${limit + 1}
+                OFFSET ${offset}
+            `;
+        } else {
+            // standard query
+            query = await sql`
+                SELECT 
+                    a.id,
+                    a.title,
+                    a.summary,
+                    a.short_summary as "shortSummary",
+                    a.extended_summary as "extendedSummary",
+                    a.url,
+                    a.image,
+                    a.author,
+                    a.published_at as "publishedAt",
+                    json_build_object(
+                        'id', s.id,
+                        'name', s.name,
+                        'websiteUrl', s.website_url
+                    ) as source,
+                    COALESCE(
+                        json_agg(
+                            json_build_object('id', c.id, 'name', c.name)
+                        ) FILTER (WHERE c.id IS NOT NULL),
+                        '[]'
+                    ) as categories
+                FROM articles a
+                JOIN sources s ON a.source_id = s.id
+                LEFT JOIN article_categories ac ON a.id = ac.article_id
+                LEFT JOIN categories c ON ac.category_id = c.id
+                WHERE (${searchPattern}::text IS NULL OR (a.title ILIKE ${searchPattern} OR a.summary ILIKE ${searchPattern}))
+                GROUP BY a.id, s.id
+                ORDER BY a.published_at DESC
+                LIMIT ${limit + 1}
+                OFFSET ${offset}
+            `;
+        }
 
-        // Assuming Xano returns the total count in the response or we need to handle it
-        // For now, we'll estimate total pages based on the returned data
-        const total = articles.length; // This might need adjustment based on Xano's response structure
-        const totalPages = Math.ceil(total / limit);
+        // Map over rows to ensure raw query result shapes match our interface
+        const articles = query.rows.map(row => ({
+            ...row,
+            categories: row.categories || []
+        })) as ArticleWithSource[];
+
+        const hasMore = articles.length > limit;
+        const articlesToReturn = hasMore ? articles.slice(0, limit) : articles;
 
         return {
-            articles: articles as ArticleWithRelations[],
-            metadata: {
-                total,
-                page,
-                totalPages,
-            },
+            articles: articlesToReturn,
+            hasMore,
         };
     } catch (error) {
-        console.error('Error fetching articles from Xano:', error);
+        console.error('Error fetching articles:', error);
         return {
             articles: [],
-            metadata: {
-                total: 0,
-                page,
-                totalPages: 0,
-            },
+            hasMore: false,
         };
     }
 }
