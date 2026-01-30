@@ -92,5 +92,31 @@ npx tsx scripts/test-ingest.ts
 
 ---
 
+## ☁️ Deploying to Vercel
+
+### Important: Database Migration
+Vercel is a serverless platform with an ephemeral file system. **You cannot use SQLite (`.db` files) on Vercel** because the database will be reset on every deployment.
+
+**Before deploying:**
+1.  **Switch to Postgres**: Use [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres), [Neon](https://neon.tech/), or [Turso](https://turso.tech/) (LibSQL).
+2.  **Update Configuration**:
+    - Update `prisma/schema.prisma`:
+      ```prisma
+      datasource db {
+        provider = "postgresql" // or "libsql" for Turso
+        url      = env("DATABASE_URL")
+      }
+      ```
+    - Update `.env` with your new database connection string.
+3.  **Push Schema**: Run `npx prisma db push` against the new database.
+
+### Automation (Cron Jobs)
+This project includes a `vercel.json` file that automatically configures a Cron Job to ingest news every hour.
+
+1.  **Deploy**: Connect your GitHub repo to Vercel.
+2.  **Environment Variables**: Add `DATABASE_URL` (and optionally `CRON_SECRET` if you secured the API).
+3.  **Verify**: Check the "Cron Jobs" tab in your Vercel dashboard to see the scheduled ingestion.
+
+---
+
 © The Boring Project. Engineered to be dull.
-# The-Boring-News
