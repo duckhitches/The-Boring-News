@@ -20,7 +20,7 @@ export async function ingestAllFeeds(): Promise<IngestReport[]> {
 
     const reports: IngestReport[] = [];
 
-    for (const source of sources.rows) {
+    for (const source of (sources.rows as any[])) {
         const report = await ingestFeed(source.id, source.name, source.feed_url);
         reports.push(report);
     }
