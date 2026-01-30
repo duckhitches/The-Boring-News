@@ -35,18 +35,18 @@ export const xano = {
             ...(category && { category }),
         });
 
-        return xanoFetch<any[]>(`/articles?${queryParams}`);
+        return xanoFetch<any[]>(`/article?${queryParams}`);
     },
 
     async createArticle(data: any) {
-        return xanoFetch<any>('/articles', {
+        return xanoFetch<any>('/article', {
             method: 'POST',
             body: JSON.stringify(data),
         });
     },
 
     async getSources() {
-        return xanoFetch<any[]>('/sources');
+        return xanoFetch<any[]>('/source');
     },
 
     async triggerIngest() {
