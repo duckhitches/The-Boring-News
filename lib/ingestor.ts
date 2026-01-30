@@ -1,5 +1,5 @@
 import Parser from 'rss-parser';
-import { prisma } from './prisma';
+import { xano } from './xano';
 
 const parser = new Parser();
 
@@ -33,7 +33,7 @@ function cleanItem(item: any) {
     const extendedSummary = truncateWords(summaryText, 80);
 
     // Normalize Date
-    const publishedAt = item.isoDate ? new Date(item.isoDate) : new Date();
+    const publishedAt = item.isoDate ? new Date(item.isoDate).toISOString() : new Date().toISOString();
 
     return {
         title: item.title,
@@ -43,23 +43,25 @@ function cleanItem(item: any) {
         extendedSummary: extendedSummary,
         publishedAt: publishedAt,
         author: item.creator || item.author || null,
+        image: item.enclosure?.url || item.image?.url || null,
     };
 }
 
 export async function ingestAllFeeds() {
     console.log("Starting ingestion...");
-    const sources = await prisma.source.findMany({
-        where: { enabled: true },
-    });
+
+    // Get sources from Xano
+    const sources = await xano.getSources();
+    const enabledSources = sources.filter((s: any) => s.enabled);
 
     const report = [];
     const CONCURRENCY_LIMIT = 5;
 
     // Process sources in chunks to limit concurrency
-    for (let i = 0; i < sources.length; i += CONCURRENCY_LIMIT) {
-        const chunk = sources.slice(i, i + CONCURRENCY_LIMIT);
+    for (let i = 0; i < enabledSources.length; i += CONCURRENCY_LIMIT) {
+        const chunk = enabledSources.slice(i, i + CONCURRENCY_LIMIT);
 
-        const chunkResults = await Promise.all(chunk.map(async (source) => {
+        const chunkResults = await Promise.all(chunk.map(async (source: any) => {
             try {
                 console.log(`Fetching feed: ${source.name}`);
                 const feed = await parseWithTimeout(source.feedUrl);
@@ -71,23 +73,17 @@ export async function ingestAllFeeds() {
                     // Clean and prepare data
                     const validItem = cleanItem(item);
 
-                    // Check for duplicates
-                    const existing = await prisma.article.findUnique({
-                        where: { url: validItem.url },
-                    });
-
-                    if (!existing) {
-                        try {
-                            await prisma.article.create({
-                                data: {
-                                    ...validItem,
-                                    sourceId: source.id,
-                                },
-                            });
-                            added++;
-                        } catch (e) {
-                            // Ignore unique constraint violations if they happen in race conditions
-                            console.warn(`Skipping duplicate or error for ${validItem.url}`);
+                    try {
+                        // Xano will handle duplicate checking (unique constraint on URL)
+                        await xano.createArticle({
+                            ...validItem,
+                            sourceId: source.id,
+                        });
+                        added++;
+                    } catch (e: any) {
+                        // Ignore duplicate errors from Xano
+                        if (!e.message?.includes('duplicate') && !e.message?.includes('unique')) {
+                            console.warn(`Error creating article ${validItem.url}:`, e.message);
                         }
                     }
                 }
