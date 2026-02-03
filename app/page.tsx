@@ -18,9 +18,9 @@ export default async function Home(props: Props) {
   const { articles } = await getArticles({ limit: 30, search }); // Initial load
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black font-sans text-zinc-900 dark:text-zinc-100 relative">
-      {/* Background Layer */}
-      <div className="fixed inset-0 z-0 pointer-events-auto backdrop-blur-lg">
+    <div className="min-h-screen bg-white dark:bg-black font-mono text-black dark:text-white relative overflow-x-hidden selection:bg-pink-500 selection:text-white">
+      {/* Background Layer - Raw, no blur */}
+      <div className="fixed inset-0 z-0 pointer-events-auto opacity-30 dark:opacity-50 mix-blend-overlay">
         <Balatro 
           isRotate={true} 
           mouseInteraction={true}
@@ -28,39 +28,53 @@ export default async function Home(props: Props) {
         />
       </div>
 
-      <div className="relative z-10">
+      {/* Grid Overlay */}
+      <div className="fixed inset-0 z-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+
+      <div className="relative z-10 flex flex-col min-h-screen">
         <Header />
         
-        <main id='hero' className="container mx-auto px-4 py-8">
-        <div className="mb-8 flex flex-col md:flex-row items-start md:items-end justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold font-boldonse text-white tracking-tight mb-2">Detailed Tech News</h1>
-            <p className="text-white dark:text-white">
-              Curated technology updates from trusted sources.
-            </p>
-            <div className="mt-3">
-              <RefreshNews />
+        <main id='hero' className="container mx-auto px-4 py-12 flex-1 flex flex-col gap-12">
+          
+          {/* Header Section */}
+          <section className="flex flex-col gap-6 border-b-2 border-black dark:border-white pb-12">
+            <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8">
+              <div className="flex flex-col gap-2">
+                <h1 className="text-4xl md:text-6xl font-bold font-boldonse uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-black to-zinc-500 dark:from-white dark:to-zinc-500 [-webkit-text-stroke:1px_rgba(0,0,0,0.2)] dark:[-webkit-text-stroke:1px_rgba(255,255,255,0.2)]">
+                  The_<br/><span className="text-pink-500">Boring</span>_News
+                </h1>
+                <p className="text-sm md:text-base font-bold uppercase tracking-widest text-zinc-500">
+                  // CURATED_TECH_UPDATES__V2.0
+                </p>
+              </div>
+              
+              <div className="flex flex-col items-end gap-4 w-full md:w-auto">
+                <RefreshNews />
+                <Search />
+              </div>
             </div>
-          </div>
-          <Search />
-        </div>
+          </section>
 
-        {articles.length === 0 ? (
-           <div className="text-center py-20">
-             <p className="text-xl text-zinc-500">
-               {search ? `No articles found for "${search}"` : "No news articles yet. Use “Refresh news” above to fetch the latest."}
-             </p>
+          {/* Feed Section */}
+          <section>
+             {articles.length === 0 ? (
+               <div className="border-2 border-dashed border-zinc-300 dark:border-zinc-700 p-12 text-center">
+                 <p className="text-xl font-bold uppercase tracking-widest text-zinc-500">
+                   {search ? `NO_MATCHES_FOR_"${search}"` : "NO_DATA_AVAILABLE"}
+                 </p>
+               </div>
+             ) : (
+               <ArticleFeed initialArticles={articles} search={search} />
+             )}
+          </section>
+        </main>
+
+        <footer className="border-t-2 border-black dark:border-white bg-white dark:bg-black py-8 mt-auto z-20 relative">
+           <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-bold uppercase tracking-widest text-zinc-500">
+             <p>© {new Date().getFullYear()} TBN_CORP</p>
+             <p>EST. 2024 // SYSTEM_STATUS: ONLINE</p>
            </div>
-        ) : (
-          <ArticleFeed initialArticles={articles} search={search} />
-        )}
-      </main>
-
-      <footer className="border-t border-zinc-200 dark:border-zinc-800 py-8 mt-12 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm">
-         <div className="container mx-auto px-4 text-center text-sm text-zinc-500">
-           <p>© {new Date().getFullYear()} The Boring News.</p>
-         </div>
-      </footer>
+        </footer>
       </div>
     </div>
   );

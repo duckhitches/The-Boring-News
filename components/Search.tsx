@@ -35,24 +35,27 @@ export function Search() {
   };
 
   return (
-    <div className="relative flex flex-1 flex-shrink-0 w-full max-w-md">
+    <div className="relative flex flex-1 flex-shrink-0 w-full max-w-md font-mono group">
       <label htmlFor="search" className="sr-only">
         Search
       </label>
+      <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+         {isPending ? (
+             <div className="h-4 w-4 bg-pink-500 animate-pulse" />
+         ) : (
+             <SearchIcon className="h-4 w-4 text-black dark:text-white" />
+         )}
+      </div>
       <input
-        className="block w-full rounded-full border border-white py-[9px] pl-10 text-sm placeholder:text-pink-500 text-zinc-900 dark:text-zinc-100 bg-white/10 backdrop-blur-md focus:bg-white/20 dark:focus:bg-black/40 transition-all font-medium focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
-        placeholder="Search articles..."
+        className="block w-full border-2 border-black dark:border-white py-2 pl-10 text-sm placeholder:text-zinc-500 text-black dark:text-white bg-background focus:outline-none focus:ring-0 focus:bg-pink-50 dark:focus:bg-zinc-900 transition-none rounded-none uppercase tracking-wide"
+        placeholder="SEARCH_ARTICLES..."
         onChange={(e) => {
           debouncedHandleSearch(e.target.value);
         }}
         defaultValue={searchParams.get('search')?.toString()}
       />
-      <SearchIcon className="absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-zinc-400 peer-focus:text-zinc-900 dark:peer-focus:text-zinc-100" />
-      {isPending && (
-         <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-500 border-t-transparent"></div>
-         </div>
-      )}
+      {/* Hard shadow decoration */}
+      <div className="absolute inset-0 border-2 border-black dark:border-white translate-x-1 translate-y-1 -z-10 group-focus-within:translate-x-0 group-focus-within:translate-y-0 transition-transform duration-75" />
     </div>
   );
 }

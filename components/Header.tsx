@@ -44,13 +44,13 @@ export function Header() {
         items={menuItems}
         colors={["#2563eb", "#06b6d4"]} // Blue-600 to Cyan-500
         accentColor="#2563eb"
-        menuButtonColor="#2563eb"
+        menuButtonColor="#ffffffff"
         openMenuButtonColor="#fff"
         logoContent={
           <Link href="/" className="flex items-center gap-2 group">
             
               <Image  className='rounded-full bg-black mt-1 pt-1 mb-1 pb-1' src="/brand-logo.png" alt="Logo" width={40} height={40} />
-            <span className="font-boldonse font-bold ">
+            <span className="font-boldonse text-pink-500 font-bold ">
               The Boring News
             </span>
           </Link>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Terminal } from 'lucide-react';
 
 export function RefreshNews() {
   const router = useRouter();
@@ -16,36 +16,39 @@ export function RefreshNews() {
       const res = await fetch('/api/ingest', { method: 'POST' });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setMessage(data.error ?? 'Refresh failed');
+        setMessage(data.error ?? 'FAILED');
         return;
       }
-      setMessage('Updated. Refreshing…');
+      setMessage('SYNC_COMPLETE');
       router.refresh();
-      setMessage(null);
+      // Clear success message after delay
+      setTimeout(() => setMessage(null), 3000);
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : 'Refresh failed');
+      setMessage(e instanceof Error ? e.message : 'ERROR');
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-4 font-mono">
       <button
         type="button"
         onClick={handleRefresh}
         disabled={loading}
-        className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-pink-500 hover:bg-pink-600 disabled:opacity-60 disabled:cursor-not-allowed rounded-lg transition-colors"
+        className="group relative inline-flex items-center gap-2 px-4 py-2 text-sm font-bold uppercase tracking-wider bg-pink-500 text-black dark:text-white border-2 border-black dark:border-white bg-background hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black disabled:opacity-50 disabled:cursor-not-allowed transition-all active:translate-x-[2px] active:translate-y-[2px]"
         aria-label="Fetch latest news and refresh"
       >
+        <div className="absolute inset-0 group-hover:opacity-10 transition-opacity" />
         <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-        {loading ? 'Updating…' : 'Refresh news'}
+        <span>{loading ? 'SYNCING...' : 'REFRESH_FEED'}</span>
       </button>
-      {message && (
-        <span className="text-sm text-amber-500" role="status">
-          {message}
+      {message && ( 
+        <span className="text-xs font-bold uppercase text-pink-500 flex items-center gap-1 animate-in fade-in slide-in-from-left-2">
+          <Terminal className="w-3 h-3" />
+          [{message}]
         </span>
-      )}
+      )}  
     </div>
   );
 }

@@ -20,15 +20,17 @@ function Placeholder({ alt, variant }: { alt: string; variant: 'card' | 'modal' 
   const isCard = variant === 'card';
   return (
     <div
-      className="absolute inset-0 flex items-center justify-center bg-linear-to-br from-zinc-200 to-zinc-300 dark:from-zinc-800 dark:to-zinc-900"
+      className="absolute inset-0 flex items-center justify-center bg-zinc-200 dark:bg-zinc-800 border-2 border-transparent"
       aria-hidden
     >
       <span className="sr-only">No image: {alt}</span>
       <Newspaper
-        className={`text-zinc-400 dark:text-zinc-500 ${
+        className={`text-zinc-400 dark:text-zinc-500 opacity-50 ${
           isCard ? 'w-12 h-12' : 'w-16 h-16'
         }`}
       />
+      {/* Pattern overlay for missing image */}
+      <div className="absolute inset-0 bg-[radial-gradient(#000000_1px,transparent_1px)] [background-size:8px_8px] opacity-10 pointer-events-none" />
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useInView } from 'react-intersection-observer';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Terminal } from 'lucide-react';
 import { getArticles, type ArticleWithRelations } from '@/lib/actions';
 import { NewsCard } from './NewsCard';
 
@@ -110,30 +110,39 @@ export function ArticleFeed({ initialArticles, search }: ArticleFeedProps) {
     }, [inView, hasMore, isLoading, loadMoreArticles]);
 
     return (
-        <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="font-mono">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {articles.map((article) => (
                     <NewsCard key={article.id} article={article} />
                 ))}
             </div>
             
             {hasMore && (
-                <div ref={ref} className="flex justify-center p-8 mt-4">
-                    <Loader2 className="w-8 h-8 animate-spin text-zinc-500" />
+                <div ref={ref} className="flex justify-center p-12 mt-4">
+                    <div className="flex items-center gap-2 text-black dark:text-white uppercase font-bold tracking-widest animate-pulse">
+                        <div className="w-3 h-3 bg-pink-500" />
+                        LOADING_MORE_DATA...
+                    </div>
                 </div>
             )}
             
             {!hasMore && articles.length > 0 && (
-                <div className="text-center py-8 text-zinc-500">
-                    You've reached the end of the news feed.
+                <div className="text-center py-12 text-zinc-400 dark:text-zinc-600 font-bold uppercase tracking-widest border-t-2 border-dashed border-zinc-200 dark:border-zinc-800 mt-12">
+                    [END_OF_STREAM]
                 </div>
             )}
              
             {articles.length === 0 && (
-                <div className="text-center py-20 text-zinc-500">
-                    No articles found matching your search.
+                <div className="text-center py-32 flex flex-col items-center gap-4 text-zinc-500">
+                    <Terminal className="w-12 h-12 opacity-50" />
+                    <div className="font-bold uppercase tracking-widest text-lg">
+                        NO_DATA_MATCHING_QUERY
+                    </div>
+                    <div className="text-xs max-w-sm mx-auto opacity-70">
+                        Try adjusting your search filters or check back later for new ingestion cycles.
+                    </div>
                 </div>
             )}
-        </>
+        </div>
     );
 }

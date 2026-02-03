@@ -2,15 +2,15 @@ import { Header } from '@/components/Header';
 import Balatro from '@/components/Balatro';
 
 export const metadata = {
-  title: "About - The Boring News",
+  title: "ABOUT // THE_BORING_NEWS",
   description: "Why we built a boring tech news aggregator.",
 };
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black font-sans text-zinc-900 dark:text-zinc-100 relative">
+    <div className="min-h-screen bg-zinc-50 dark:bg-black font-mono text-black dark:text-white relative selection:bg-pink-500 selection:text-white">
       {/* Background Layer (Consistent with Home) */}
-      <div className="fixed inset-0 z-0 pointer-events-auto backdrop-blur-lg">
+      <div className="fixed inset-0 z-0 pointer-events-auto opacity-30 dark:opacity-50 mix-blend-overlay">
         <Balatro 
           isRotate={true} 
           mouseInteraction={true}
@@ -18,127 +18,122 @@ export default function AboutPage() {
         />
       </div>
 
-      <div className="relative z-10">
+       {/* Grid Overlay */}
+      <div className="fixed inset-0 z-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+
+      <div className="relative z-10 flex flex-col min-h-screen">
         <Header />
         
-        <main className="container mx-auto px-4 py-8 max-w-3xl">
-          <article className="prose prose-zinc dark:prose-invert lg:prose-lg bg-white/50 dark:bg-zinc-900/50 p-8 rounded-2xl backdrop-blur-md shadow-sm border border-zinc-200/50 dark:border-zinc-800/50">
-            <h1 className="font-boldonse font-bold text-4xl mb-6">About The Boring News</h1>
+        <main className="container mx-auto px-4 py-12 max-w-4xl flex-1 flex flex-col gap-16">
+          
+          {/* Header Block */}
+          <header className="border-b-4 border-black dark:border-white pb-8">
+            <h1 className="font-boldonse font-bold text-4xl sm:text-5xl md:text-7xl uppercase tracking-tighter mb-4 text-transparent bg-clip-text bg-gradient-to-b from-black to-zinc-500 dark:from-white dark:to-zinc-500 break-words">
+              About_<br/><span className="text-pink-500">Project</span>
+            </h1>
+            <p className="text-xl md:text-2xl font-bold uppercase tracking-widest text-zinc-500">
+              // MANIFESTO_V1.0
+            </p>
+          </header>
             
-            <section className="mb-10">
-              <h2 className="text-2xl font-bold font-mono mb-4 flex items-center gap-2">
-                Purpose of the Page
+            <section className="grid md:grid-cols-[200px_1fr] gap-8 items-start">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-500 mt-2">
+                01 // PURPOSE
               </h2>
-              <p className="text-zinc-700 font-mono dark:text-zinc-300 leading-relaxed">
-                The Boring News exists to solve a specific problem: <strong>information overload in the developer ecosystem</strong>. 
-                Technology moves fast, but the noise surrounding it moves faster. We built this merely to be a calm, quiet place 
-                where you can find relevant updates without fighting for your attention.
-              </p>
-            </section>
-
-             {/* NEW: Gemini Integration Section */}
-             <section className="mb-12 relative overflow-hidden rounded-xl border border-blue-100 dark:border-blue-900/50 bg-gradient-to-br from-blue-50/50 to-purple-50/50 dark:from-blue-950/20 dark:to-purple-950/20 p-6 sm:p-8">
-              
-              <h2 className="text-2xl font-bold font-boldonse mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
-                Powered by Gemini Intelligence
-              </h2>
-              
-              <div className="grid gap-6">
-                <div className="bg-white/60 dark:bg-zinc-900/60 p-5 rounded-lg border border-blue-100 dark:border-blue-900/30">
-                  <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-200 mb-2">
-                    Smart Summarization
-                  </h3>
-                  <p className="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed font-mono">
-                    We use Google's <strong>Gemini 1.5 Flash</strong> model to read every article for you. Instead of generic excerpts, 
-                    we generate a concise "hook" and exactly two key insights per story. This lets you understand the 
-                    <em>why</em> and <em>what</em> before you ever click out.
-                  </p>
-                </div>
-
-                <div className="bg-white/60 dark:bg-zinc-900/60 p-5 rounded-lg border border-blue-100 dark:border-blue-900/30">
-                  <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-200 mb-2">
-                    Intelligent Extraction
-                  </h3>
-                  <p className="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed font-mono">
-                    Our new ingestion engine uses advanced DOM parsing to find the highest quality imagery for every story, 
-                    ensuring your feed is as visual as it is informative. No more broken layout or missing thumbnails.
-                  </p>
-                </div>
+              <div className="text-lg md:text-xl leading-relaxed font-bold">
+                <p className="mb-6">
+                   THE_BORING_NEWS EXISTS TO SOLVE A SPECIFIC PROBLEM: <span className="text-pink-500">INFORMATION_OVERLOAD</span>.
+                </p>
+                <p className="text-base md:text-lg opacity-80">
+                  Technology moves fast, but the noise surrounding it moves faster. We built this merely to be a calm, quiet place where you can find relevant updates without fighting for your attention.
+                </p>
               </div>
             </section>
 
-            <section className="mb-10">
-              <h2 className="text-2xl font-bold font-mono mb-4">Why this project exists</h2>
-              <ul className="list-disc pl-5 space-y-2 text-zinc-700 font-mono dark:text-zinc-300">
-                <li>
-                  <strong>Signal over noise.</strong> Most platforms prioritize engagement over information. We prioritize clarity.
+             {/* Gemini Integration Section - Hard Borders */}
+             <section className="border-2 border-black dark:border-white p-6 md:p-12 relative overflow-hidden bg-white dark:bg-black">
+               <div className="absolute top-0 right-0 p-2 bg-black text-white dark:bg-white dark:text-black font-bold uppercase text-xs tracking-widest border-l-2 border-b-2 border-inherit">
+                 AI_INTEGRATION
+               </div>
+               
+              <div className="grid md:grid-cols-[200px_1fr] gap-8 items-start relative z-10">
+                 <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-500 mt-2">
+                  02 // ENGINE
+                </h2>
+                <div>
+                  <h3 className="text-2xl md:text-3xl font-bold uppercase mb-6 tracking-tight">
+                    Powered by <span className="text-pink-500">Gemini 1.5 Flash</span>
+                  </h3>
+                  
+                  <div className="grid gap-8">
+                    <div>
+                      <h4 className="font-bold uppercase tracking-wider mb-2 border-b-2 border-black dark:border-white inline-block pb-1">
+                        Smart Summarization
+                      </h4>
+                      <p className="text-sm opacity-80 leading-relaxed">
+                        We use Google's Gemini model to read every article. Instead of generic excerpts, we generate a concise "hook" and exactly two key insights per story.
+                      </p>
+                    </div>
+
+                    <div>
+                      <h4 className="font-bold uppercase tracking-wider mb-2 border-b-2 border-black dark:border-white inline-block pb-1">
+                        Intelligent Extraction
+                      </h4>
+                      <p className="text-sm opacity-80 leading-relaxed">
+                        Our ingestion engine uses advanced DOM parsing to find high-quality imagery, ensuring a visual consistency across the feed.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+               {/* Decorative Background Grid inside card */}
+               <div className="absolute inset-0 z-0 bg-[radial-gradient(#000000_1px,transparent_1px)] [background-size:8px_8px] dark:bg-[radial-gradient(#ffffff_1px,transparent_1px)] opacity-5 pointer-events-none" />
+            </section>
+
+            <section className="grid md:grid-cols-[200px_1fr] gap-8 items-start">
+              <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-500 mt-2">
+                03 // PHILOSOPHY
+              </h2>
+              <ul className="space-y-6">
+                <li className="flex gap-4 items-start">
+                   <span className="font-bold text-pink-500">[A]</span>
+                   <div>
+                      <strong className="block uppercase tracking-wider mb-1">Signal over noise</strong>
+                      <span className="opacity-70 text-sm">Most platforms prioritize engagement. We prioritize clarity.</span>
+                   </div>
                 </li>
-                <li>
-                  <strong>Distraction-free.</strong> No infinite feeds of doom, no outrage bait, no "you won't believe what happened next."
+                <li className="flex gap-4 items-start">
+                   <span className="font-bold text-pink-500">[B]</span>
+                   <div>
+                      <strong className="block uppercase tracking-wider mb-1">Distraction-free</strong>
+                      <span className="opacity-70 text-sm">No infinite feeds of doom, no outrage bait.</span>
+                   </div>
                 </li>
-                <li>
-                  <strong>A Clean Discovery Layer.</strong> We don't host the content; we just help you find it. Think of us as a compassionate filter.
+                 <li className="flex gap-4 items-start">
+                   <span className="font-bold text-pink-500">[C]</span>
+                   <div>
+                      <strong className="block uppercase tracking-wider mb-1">Compassionate Filter</strong>
+                      <span className="opacity-70 text-sm">We don't host the content; we just help you find it.</span>
+                   </div>
                 </li>
               </ul>
             </section>
 
-            <section className="mb-10">
-              <h2 className="text-2xl font-bold font-mono mb-4">Why it is useful</h2>
-              <ul className="list-disc pl-5 space-y-2 text-zinc-700 font-mono dark:text-zinc-300">
-                <li>
-                  <strong>Aggregated Sources.</strong> We pull from trusted engineering blogs, changelogs, and verified tech news outlets.
-                </li>
-                <li>
-                  <strong>Respectful Summaries.</strong> Short, LLM-generated summaries let you scan quickly. If it looks interesting, you click through to the original author.
-                </li>
-                <li>
-                  <strong>Credit where it's due.</strong> We always link back. We are a signpost, not a destination.
-                </li>
-              </ul>
+             <section className="bg-black text-white dark:bg-white dark:text-black p-8 md:p-12">
+               <h2 className="text-xl md:text-2xl font-bold uppercase tracking-tighter mb-4">
+                 "Boring software is software that works."
+               </h2>
+               <p className="font-mono text-sm uppercase tracking-widest opacity-70">
+                 // PREDICTABLE. STABLE. RELIABLE.
+               </p>
             </section>
-
-            <section className="mb-10">
-              <h2 className="text-2xl font-bold font-mono mb-4">System Design & Architecture</h2>
-              <p className="text-zinc-700 font-mono dark:text-zinc-300 mb-4">
-                We believe boring software is good software. Our architecture reflects that:
-              </p>
-              <ul className="list-disc pl-5 space-y-2 text-zinc-700 font-mono dark:text-zinc-300">
-                <li>
-                  <strong>Background Ingestion.</strong> Data is fetched via cron jobs, not on the client. Your browser shouldn't do our heavy lifting.
-                </li>
-                <li>
-                  <strong>Parallel Processing.</strong> We fetch from multiple APIs concurrently to keep our data fresh without latency penalties.
-                </li>
-                <li>
-                  <strong>Deduplication.</strong> Smart logic prevents you from seeing the same press release 15 times.
-                </li>
-                <li>
-                  <strong>Ethical Aggregation.</strong> We store metadata, not full content. We respect the open web.
-                </li>
-              </ul>
-            </section>
-
-            <section className="mb-10">
-              <h2 className="text-2xl font-bold font-mono mb-4">Who it’s built for</h2>
-              <p className="text-zinc-700 font-mono dark:text-zinc-300">
-                Developers, software engineers, and anyone who appreciates systems that just work. 
-                If you care about clean architecture, minimal design, and high signal-to-noise ratios, you're in the right place.
-              </p>
-            </section>
-
-             <section>
-              <h2 className="text-2xl font-bold font-mono mb-4">The Meaning of "Boring"</h2>
-              <p className="text-zinc-700 font-mono dark:text-zinc-300 italic border-l-4 border-blue-500 pl-4 py-1 bg-blue-50 dark:bg-blue-900/10 rounded-r-lg">
-                "Boring software is software that works. It is predictable, stable, and reliable. 
-                It doesn't try to surprise you; it tries to serve you."
-              </p>
-            </section>
-          </article>
         </main>
 
-        <footer className="border-t border-zinc-200 dark:border-zinc-800 py-8 mt-12 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm">
-           <div className="container mx-auto px-4 text-center text-sm text-zinc-500">
-             <p>© {new Date().getFullYear()} The Boring Project. Engineered to be dull.</p>
+        <footer className="border-t-2 border-black dark:border-white bg-white dark:bg-black py-8 mt-auto z-20">
+           <div className="container mx-auto px-4 text-center">
+             <p className="text-xs font-bold uppercase tracking-widest text-zinc-500">
+               © {new Date().getFullYear()} THE_BORING_PROJECT // ENGINEERED_TO_BE_DULL
+             </p>
            </div>
         </footer>
       </div>
