@@ -1,10 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { Loader2 } from 'lucide-react';
 import { getArticles, type ArticleWithRelations } from '@/lib/actions';
 import { NewsCard } from './NewsCard';
+
+const PAGE_SIZE = 30;
+const LAZY_LOAD_THROTTLE_MS = 300;
+
+type CacheEntry = { articles: ArticleWithRelations[]; hasMore: boolean };
+
+function cacheKey(offset: number, search: string | undefined) {
+    return `${search ?? ''}:${offset}`;
+}
 
 type ArticleFeedProps = {
     initialArticles: ArticleWithRelations[];
@@ -16,7 +25,20 @@ export function ArticleFeed({ initialArticles, search }: ArticleFeedProps) {
     const [offset, setOffset] = useState(initialArticles.length);
     const [hasMore, setHasMore] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
-    const [ref, inView] = useInView();
+    const [ref, inView] = useInView({ rootMargin: '200px', threshold: 0 });
+    const cacheRef = useRef<Map<string, CacheEntry>>(new Map());
+    const throttleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    // Seed cache with initial page so we don't re-fetch it
+    useEffect(() => {
+        const key = cacheKey(0, search);
+        if (!cacheRef.current.has(key) && initialArticles.length > 0) {
+            cacheRef.current.set(key, {
+                articles: initialArticles,
+                hasMore: initialArticles.length >= PAGE_SIZE,
+            });
+        }
+    }, [search, initialArticles]);
 
     // Reset state when search changes
     useEffect(() => {
@@ -25,41 +47,67 @@ export function ArticleFeed({ initialArticles, search }: ArticleFeedProps) {
         setHasMore(true);
     }, [initialArticles, search]);
 
-    async function loadMoreArticles() {
+    const loadMoreArticles = useCallback(async () => {
         if (!hasMore || isLoading) return;
-        
+
+        const key = cacheKey(offset, search);
+        const cached = cacheRef.current.get(key);
+        if (cached) {
+            if (cached.articles.length === 0) {
+                setHasMore(false);
+            } else {
+                setArticles((prev) => {
+                    const existingIds = new Set(prev.map((a) => a.id));
+                    const unique = cached.articles.filter((a) => !existingIds.has(a.id));
+                    return unique.length ? [...prev, ...unique] : prev;
+                });
+                setOffset((prev) => prev + cached.articles.length);
+                setHasMore(cached.hasMore);
+            }
+            return;
+        }
+
         setIsLoading(true);
         try {
-            const { articles: newArticles, hasMore: moreAvailable } = await getArticles({ 
-                offset, 
-                limit: 30,
-                search
+            const { articles: newArticles, hasMore: moreAvailable } = await getArticles({
+                offset,
+                limit: PAGE_SIZE,
+                search,
             });
-            
+
+            cacheRef.current.set(key, { articles: newArticles, hasMore: moreAvailable });
+
             if (newArticles.length === 0) {
                 setHasMore(false);
             } else {
                 setArticles((prev) => {
-                    // Filter out any duplicates based on ID
-                    const existingIds = new Set(prev.map(a => a.id));
-                    const uniqueNewArticles = newArticles.filter(a => !existingIds.has(a.id));
+                    const existingIds = new Set(prev.map((a) => a.id));
+                    const uniqueNewArticles = newArticles.filter((a) => !existingIds.has(a.id));
                     return [...prev, ...uniqueNewArticles];
                 });
                 setOffset((prev) => prev + newArticles.length);
                 setHasMore(moreAvailable);
             }
         } catch (error) {
-            console.error("Failed to load more articles:", error);
+            console.error('Failed to load more articles:', error);
         } finally {
             setIsLoading(false);
         }
-    }
+    }, [offset, search, hasMore, isLoading]);
 
     useEffect(() => {
-        if (inView) {
+        if (!inView || !hasMore || isLoading) return;
+
+        if (throttleRef.current) clearTimeout(throttleRef.current);
+        throttleRef.current = setTimeout(() => {
+            throttleRef.current = null;
             loadMoreArticles();
-        }
-    }, [inView]);
+        }, LAZY_LOAD_THROTTLE_MS);
+
+        return () => {
+            if (throttleRef.current) clearTimeout(throttleRef.current);
+        };
+    }, [inView, hasMore, isLoading, loadMoreArticles]);
 
     return (
         <>

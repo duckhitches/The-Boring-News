@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
 import { ExternalLink, Calendar, User, X, ChevronRight } from 'lucide-react';
 import { type ArticleWithRelations } from '@/lib/actions';
+import { getSummaryPoints } from '@/lib/utils';
+import { ArticleImage } from './ArticleImage';
 
 
 interface NewsCardProps {
@@ -11,6 +12,11 @@ interface NewsCardProps {
 
 export function NewsCard({ article }: NewsCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [article.id]);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -40,14 +46,13 @@ export function NewsCard({ article }: NewsCardProps) {
         onClick={() => setIsModalOpen(true)}
         className="group relative flex flex-col bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 cursor-pointer h-full"
       >
-        {article.image && (
-          <div className="relative w-full h-48 overflow-hidden bg-zinc-100 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-800">
-            <Image 
-              src={article.image} 
-              alt={article.title} 
-              fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        {article.image && !imageError && (
+          <div className="border-b border-zinc-200 dark:border-zinc-800 group-hover:[&_img]:scale-105">
+            <ArticleImage
+              src={article.image}
+              alt={article.title}
+              variant="card"
+              onError={() => setImageError(true)}
             />
           </div>
         )}
@@ -69,9 +74,9 @@ export function NewsCard({ article }: NewsCardProps) {
             {article.title}
           </h3>
 
-          {/* Ultra-short Summary (1-2 lines) */}
+          {/* Preview: first summary point or short summary */}
           <p className="text-sm font-mono text-zinc-600 dark:text-zinc-400 line-clamp-2 mb-4">
-            {article.shortSummary || article.summary || "Click to read more..."}
+            {getSummaryPoints(article.extendedSummary ?? null)[0] ?? article.shortSummary ?? article.summary ?? "Click to read more..."}
           </p>
 
           {/* Footer: Category & Read More Chevron */}
@@ -104,7 +109,7 @@ export function NewsCard({ article }: NewsCardProps) {
           />
 
           {/* Modal Content */}
-          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-zinc-950 rounded-2xl shadow-2xl ring-1 ring-zinc-900/5 focus:outline-none animate-in fade-in zoom-in-95 duration-200">
+          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-zinc-950 rounded-2xl shadow-2xl ring-1 ring-zinc-900/5 focus:outline-none animate-in fade-in zoom-in-95 duration-200 scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             
             {/* Close Button */}
             <button 
@@ -114,18 +119,16 @@ export function NewsCard({ article }: NewsCardProps) {
               <X className="w-5 h-5" />
             </button>
 
-            {/* Image Banner */}
-            {article.image && (
-              <div className="relative w-full h-64 sm:h-72">
-                <Image 
-                  src={article.image} 
-                  alt={article.title} 
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 800px"
+            {article.image && !imageError && (
+              <div className="relative w-full">
+                <ArticleImage
+                  src={article.image}
+                  alt={article.title}
+                  variant="modal"
                   priority
+                  onError={() => setImageError(true)}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-zinc-950 to-transparent opacity-80" />
+                <div className="absolute inset-0 bg-linear-to-t from-white dark:from-zinc-950 to-transparent opacity-80 pointer-events-none" />
               </div>
             )}
 
@@ -156,9 +159,25 @@ export function NewsCard({ article }: NewsCardProps) {
                 {article.title}
               </h2>
 
-              {/* Extended Summary */}
-              <div className="prose dark:prose-invert font-mono max-w-none text-zinc-600 dark:text-zinc-300 text-lg leading-relaxed mb-8">
-                 <p>{article.extendedSummary || article.summary || "No detailed summary available."}</p>
+              {/* Summary as 2 bullet points for better insights */}
+              <div className="font-mono max-w-none text-zinc-600 dark:text-zinc-300 text-lg leading-relaxed mb-8">
+                {(() => {
+                  const points = getSummaryPoints(article.extendedSummary ?? null);
+                  const fallback = article.extendedSummary || article.summary || "No detailed summary available.";
+                  if (points.length > 1) {
+                    return (
+                      <ul className="list-disc list-inside space-y-3 pl-1 marker:text-blue-500 dark:marker:text-cyan-400">
+                        {points.map((point, i) => (
+                          <li key={i} className="text-left">{point}</li>
+                        ))}
+                      </ul>
+                    );
+                  }
+                  if (points.length === 1) {
+                    return <p>{points[0]}</p>;
+                  }
+                  return <p>{fallback}</p>;
+                })()}
               </div>
 
               {/* CTA Section */}
@@ -170,7 +189,7 @@ export function NewsCard({ article }: NewsCardProps) {
                   href={article.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md w-full sm:w-auto justify-center"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md w-full sm:w-auto justify-center"
                 >
                   Read on {article.source.name}
                   <ExternalLink className="w-4 h-4 ml-1" />

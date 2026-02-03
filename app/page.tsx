@@ -2,6 +2,7 @@ import { getArticles } from '@/lib/actions';
 import { Header } from '@/components/Header';
 import { ArticleFeed } from '@/components/ArticleFeed';
 import { Search } from '@/components/Search';
+import { RefreshNews } from '@/components/RefreshNews';
 import Balatro from '@/components/Balatro';
 
 export const revalidate = 60; // Revalidate every 60 seconds (ISR) for better performance
@@ -37,6 +38,9 @@ export default async function Home(props: Props) {
             <p className="text-white dark:text-white">
               Curated technology updates from trusted sources.
             </p>
+            <div className="mt-3">
+              <RefreshNews />
+            </div>
           </div>
           <Search />
         </div>
@@ -44,7 +48,7 @@ export default async function Home(props: Props) {
         {articles.length === 0 ? (
            <div className="text-center py-20">
              <p className="text-xl text-zinc-500">
-               {search ? `No articles found for "${search}"` : "No news articles found. Try triggering ingestion."}
+               {search ? `No articles found for "${search}"` : "No news articles yet. Use “Refresh news” above to fetch the latest."}
              </p>
            </div>
         ) : (

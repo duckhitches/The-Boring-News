@@ -1,5 +1,6 @@
 'use server';
 
+import { unstable_cache } from 'next/cache';
 import { sql } from '@/lib/db';
 
 
@@ -38,17 +39,18 @@ export interface GetArticlesResult {
     hasMore: boolean;
 }
 
-export async function getArticles(
-    params: GetArticlesParams = {}
-): Promise<GetArticlesResult> {
-    const { limit = 30, offset = 0, category, search } = params;
+async function fetchArticlesFromDb(params: {
+    limit: number;
+    offset: number;
+    category: string | null;
+    search: string | null;
+}): Promise<GetArticlesResult> {
+    const { limit, offset, category, search } = params;
 
-    // Build query parts manually since we can't use composable sql`` with basic neon driver easily
     const conditions: string[] = [];
     const values: any[] = [];
     let paramIndex = 1;
 
-    // Helper to add param
     const addParam = (val: string | number | boolean | null) => {
         values.push(val);
         return `$${paramIndex++}`;
@@ -66,7 +68,7 @@ export async function getArticles(
 
     if (search) {
         const searchPattern = `%${search}%`;
-        const idx = paramIndex++; // use current index
+        const idx = paramIndex++;
         values.push(searchPattern);
         conditions.push(`(a.title ILIKE $${idx} OR a.summary ILIKE $${idx})`);
     }
@@ -109,7 +111,6 @@ export async function getArticles(
     try {
         const result = await sql(queryText, ...values);
 
-        // Map over rows to ensure raw query result shapes match our interface
         const articles = result.rows.map((row: any) => ({
             ...row,
             categories: row.categories || []
@@ -129,4 +130,20 @@ export async function getArticles(
             hasMore: false,
         };
     }
+}
+
+export async function getArticles(
+    params: GetArticlesParams = {}
+): Promise<GetArticlesResult> {
+    const limit = params.limit ?? 30;
+    const offset = params.offset ?? 0;
+    const category = params.category ?? null;
+    const search = params.search ?? null;
+
+    const cacheKey = ['articles', String(limit), String(offset), category ?? '', search ?? ''];
+    return unstable_cache(
+        () => fetchArticlesFromDb({ limit, offset, category, search }),
+        cacheKey,
+        { revalidate: 60, tags: ['articles'] }
+    )();
 }

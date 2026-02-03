@@ -1,31 +1,43 @@
 import 'dotenv/config';
+import { sql } from '../lib/db';
 import { ingestAllFeeds } from '../lib/ingestor';
 
 const APP_URL = process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 const CRON_SECRET = process.env.CRON_SECRET ?? process.env.INGEST_SECRET;
 
-async function test() {
-    console.log("Running ingestion test...");
+async function reingestAll() {
+    console.log("⚠️  Clearing all articles from database...");
+    try {
+        await sql`DELETE FROM articles`;
+        console.log("✓ All articles deleted.");
+    } catch (e) {
+        console.error("Failed to delete articles:", e);
+        return;
+    }
+
+    console.log("\n🚀 Starting full ingestion...");
     try {
         const report = await ingestAllFeeds();
         console.log("Ingestion Report:", JSON.stringify(report, null, 2));
 
-        // Invalidate Next.js cache so the app shows new articles
+        // Invalidate Next.js cache
         try {
             const revalidateUrl = new URL('/api/revalidate', APP_URL);
             if (CRON_SECRET) revalidateUrl.searchParams.set('secret', CRON_SECRET);
             const res = await fetch(revalidateUrl.toString(), { method: 'POST' });
             if (res.ok) {
-                console.log("Cache revalidated; app will show fresh articles on next load.");
+                console.log("\n✓ Cache revalidated.");
             } else {
-                console.warn("Revalidate failed (is the app running?):", res.status);
+                console.warn("\n! Revalidate failed (is the app running?):", res.status);
             }
         } catch (e) {
-            console.warn("Could not revalidate cache (is the app running at", APP_URL, "?):", e);
+            console.warn("\n! Could not revalidate cache:", e);
         }
     } catch (e) {
         console.error("Ingestion failed:", e);
     }
+
+    process.exit(0);
 }
 
-test();
+reingestAll();

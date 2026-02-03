@@ -118,6 +118,7 @@ The ingestion process is designed to be idempotent.
     Create `.env`:
     ```env
     DATABASE_URL="postgres://user:pass@endpoint.neon.tech/neondb?sslmode=require"
+    PERPLEXITY_API_KEY="pplx-..."   # Optional: for AI summaries in article modal (Perplexity Chat Completions)
     ```
 
 3.  **Database Initialization**

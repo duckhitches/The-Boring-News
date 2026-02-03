@@ -36,6 +36,37 @@ export default function AboutPage() {
               </p>
             </section>
 
+             {/* NEW: Gemini Integration Section */}
+             <section className="mb-12 relative overflow-hidden rounded-xl border border-blue-100 dark:border-blue-900/50 bg-gradient-to-br from-blue-50/50 to-purple-50/50 dark:from-blue-950/20 dark:to-purple-950/20 p-6 sm:p-8">
+              
+              <h2 className="text-2xl font-bold font-boldonse mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400">
+                Powered by Gemini Intelligence
+              </h2>
+              
+              <div className="grid gap-6">
+                <div className="bg-white/60 dark:bg-zinc-900/60 p-5 rounded-lg border border-blue-100 dark:border-blue-900/30">
+                  <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-200 mb-2">
+                    Smart Summarization
+                  </h3>
+                  <p className="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed font-mono">
+                    We use Google's <strong>Gemini 1.5 Flash</strong> model to read every article for you. Instead of generic excerpts, 
+                    we generate a concise "hook" and exactly two key insights per story. This lets you understand the 
+                    <em>why</em> and <em>what</em> before you ever click out.
+                  </p>
+                </div>
+
+                <div className="bg-white/60 dark:bg-zinc-900/60 p-5 rounded-lg border border-blue-100 dark:border-blue-900/30">
+                  <h3 className="text-lg font-semibold text-zinc-800 dark:text-zinc-200 mb-2">
+                    Intelligent Extraction
+                  </h3>
+                  <p className="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed font-mono">
+                    Our new ingestion engine uses advanced DOM parsing to find the highest quality imagery for every story, 
+                    ensuring your feed is as visual as it is informative. No more broken layout or missing thumbnails.
+                  </p>
+                </div>
+              </div>
+            </section>
+
             <section className="mb-10">
               <h2 className="text-2xl font-bold font-mono mb-4">Why this project exists</h2>
               <ul className="list-disc pl-5 space-y-2 text-zinc-700 font-mono dark:text-zinc-300">
