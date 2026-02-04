@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 Eshan Vijay Shettennavar.
+ * 
+ * This source code is licensed under the Business Source License 1.1.
+ * You may not use this file except in compliance with the License.
+ * 
+ * For full license text, see the LICENSE-BSL file in the repository root.
+ */
+
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const apiKey = process.env.GEMINI_API_KEY;

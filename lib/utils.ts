@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2026 Eshan Vijay Shettennavar.
+ * Licensed under the MIT License. See LICENSE-MIT for details.
+ */
+
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 

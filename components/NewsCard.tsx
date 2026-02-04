@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2026 Eshan Vijay Shettennavar.
+ * Licensed under the MIT License. See LICENSE-MIT for details.
+ */
+
 import { useState, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { ExternalLink, Calendar, User, X, ChevronRight, Terminal } from 'lucide-react';

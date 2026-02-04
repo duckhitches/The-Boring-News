@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2026 Eshan Vijay Shettennavar.
+ * Licensed under the MIT License. See LICENSE-MIT for details.
+ */
+
 'use client';
 
 import Link from 'next/link';

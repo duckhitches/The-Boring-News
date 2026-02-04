@@ -136,3 +136,12 @@ The ingestion process is designed to be idempotent.
     ```bash
     npm run dev
     ```
+
+## 📝 License
+
+This project is dual-licensed:
+
+- **Core Business Logic (`lib/`, `scripts/`, `app/api/`, `db/`)**: Licensed under **Business Source License 1.1 (BSL 1.1)**. Free for non-commercial use, evaluation, and educational purposes. Commercial SaaS use is restricted.
+- **UI Components (`components/`)**: Licensed under **MIT License**. Free for any use.
+
+See [LICENSE](./LICENSE) for details.

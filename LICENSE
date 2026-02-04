@@ -1,21 +1,26 @@
-MIT License
+# DUAL LICENSING NOTICE
 
-Copyright (c) 2026 Eshan Vijay Shettennavar
+This project is dual-licensed to protect the core business logic while keeping the UI components open for educational and community use.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+## 1. Restricted Core (Business Source License 1.1)
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+The backend logic, API routes, data ingestion, and AI automation components are licensed under the **Business Source License 1.1 (BSL 1.1)**.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+- **Files affected:** `lib/`, `scripts/`, `app/api/`, `db/`
+- **Permissions:** You may read, modify, and run this code for **non-commercial** purposes (e.g., learning, evaluation, portfolio demonstration).
+- **Restrictions:** You **MAY NOT** use this code to build a competing SaaS product or for any commercial production use without permission.
+- **Full Text:** See [LICENSE-BSL](./LICENSE-BSL)
+
+## 2. Open Source UI (MIT License)
+
+The frontend components, design system, and UI utilities are licensed under the **MIT License**.
+
+- **Files affected:** `components/`, `app/globals.css`, public assets.
+- **Permissions:** You are free to use, copy, modify, and distribute these components in your own projects, including commercial ones.
+- **Full Text:** See [LICENSE-MIT](./LICENSE-MIT)
+
+---
+
+## Why this structure?
+
+This is a portfolio project demonstrating complex SaaS architecture. The strict license on the backend prevents unauthorized commercial cloning of the core product value, while the permissive license on the frontend encourages sharing design patterns and UI components with the developer community.
