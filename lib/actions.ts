@@ -9,7 +9,6 @@
 
 'use server';
 
-import { unstable_cache } from 'next/cache';
 import { sql } from '@/lib/db';
 
 
@@ -53,8 +52,9 @@ async function fetchArticlesFromDb(params: {
     offset: number;
     category: string | null;
     search: string | null;
+    source: string | null;
 }): Promise<GetArticlesResult> {
-    const { limit, offset, category, search } = params;
+    const { limit, offset, category, search, source } = params;
 
     const conditions: string[] = [];
     const values: any[] = [];
@@ -80,6 +80,11 @@ async function fetchArticlesFromDb(params: {
         const idx = paramIndex++;
         values.push(searchPattern);
         conditions.push(`(a.title ILIKE $${idx} OR a.summary ILIKE $${idx})`);
+    }
+
+    if (source) {
+        // filter by source name for cleaner URLs
+        conditions.push(`s.name = ${addParam(source)}`);
     }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
@@ -142,17 +147,27 @@ async function fetchArticlesFromDb(params: {
 }
 
 export async function getArticles(
-    params: GetArticlesParams = {}
+    params: GetArticlesParams & { source?: string } = {}
 ): Promise<GetArticlesResult> {
     const limit = params.limit ?? 30;
     const offset = params.offset ?? 0;
     const category = params.category ?? null;
     const search = params.search ?? null;
+    const source = params.source ?? null;
 
-    const cacheKey = ['articles', String(limit), String(offset), category ?? '', search ?? ''];
-    return unstable_cache(
-        () => fetchArticlesFromDb({ limit, offset, category, search }),
-        cacheKey,
-        { revalidate: 60, tags: ['articles'] }
-    )();
+    return fetchArticlesFromDb({ limit, offset, category, search, source });
+}
+
+export async function getSources() {
+    try {
+        const result = await sql`
+            SELECT id, name 
+            FROM sources 
+            ORDER BY name ASC
+        `;
+        return result.rows as { id: string; name: string }[];
+    } catch (error) {
+        console.error('Error fetching sources:', error);
+        return [];
+    }
 }

@@ -1,11 +1,12 @@
-import { getArticles } from '@/lib/actions';
+import { getArticles, getSources } from '@/lib/actions';
 import { Header } from '@/components/Header';
 import { ArticleFeed } from '@/components/ArticleFeed';
 import { Search } from '@/components/Search';
 import { RefreshNews } from '@/components/RefreshNews';
+import { SourceFilter } from '@/components/SourceFilter';
 import Balatro from '@/components/Balatro';
 
-export const revalidate = 60; // Revalidate every 60 seconds (ISR) for better performance
+export const revalidate = 0; // Disable ISR to refresh on every request
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -14,8 +15,12 @@ type Props = {
 export default async function Home(props: Props) {
   const searchParams = await props.searchParams;
   const search = typeof searchParams.search === 'string' ? searchParams.search : undefined;
+  const source = typeof searchParams.source === 'string' ? searchParams.source : undefined;
   
-  const { articles } = await getArticles({ limit: 30, search }); // Initial load
+  const [ { articles }, sources ] = await Promise.all([
+     getArticles({ limit: 30, search, source }),
+     getSources()
+  ]);
 
   return (
     <div className="min-h-screen bg-white dark:bg-black font-mono text-black dark:text-white relative overflow-x-hidden selection:bg-pink-500 selection:text-white">
@@ -50,7 +55,10 @@ export default async function Home(props: Props) {
               
               <div className="flex flex-col items-end gap-4 w-full md:w-auto">
                 <RefreshNews />
-                <Search />
+                <div className="flex flex-col md:flex-row gap-4 w-full">
+                    <SourceFilter sources={sources} />
+                    <Search />
+                </div>
               </div>
             </div>
           </section>
