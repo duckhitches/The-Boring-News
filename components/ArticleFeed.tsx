@@ -16,16 +16,17 @@ const LAZY_LOAD_THROTTLE_MS = 300;
 
 type CacheEntry = { articles: ArticleWithRelations[]; hasMore: boolean };
 
-function cacheKey(offset: number, search: string | undefined) {
-    return `${search ?? ''}:${offset}`;
+function cacheKey(offset: number, search: string | undefined, source: string | undefined) {
+    return `${search ?? ''}:${source ?? ''}:${offset}`;
 }
 
 type ArticleFeedProps = {
     initialArticles: ArticleWithRelations[];
     search?: string;
+    source?: string;
 };
 
-export function ArticleFeed({ initialArticles, search }: ArticleFeedProps) {
+export function ArticleFeed({ initialArticles, search, source }: ArticleFeedProps) {
     const [articles, setArticles] = useState<ArticleWithRelations[]>(initialArticles);
     const [offset, setOffset] = useState(initialArticles.length);
     const [hasMore, setHasMore] = useState(true);
@@ -36,26 +37,26 @@ export function ArticleFeed({ initialArticles, search }: ArticleFeedProps) {
 
     // Seed cache with initial page so we don't re-fetch it
     useEffect(() => {
-        const key = cacheKey(0, search);
+        const key = cacheKey(0, search, source);
         if (!cacheRef.current.has(key) && initialArticles.length > 0) {
             cacheRef.current.set(key, {
                 articles: initialArticles,
                 hasMore: initialArticles.length >= PAGE_SIZE,
             });
         }
-    }, [search, initialArticles]);
+    }, [search, source, initialArticles]);
 
-    // Reset state when search changes
+    // Reset state when search or source changes
     useEffect(() => {
         setArticles(initialArticles);
         setOffset(initialArticles.length);
         setHasMore(true);
-    }, [initialArticles, search]);
+    }, [initialArticles, search, source]);
 
     const loadMoreArticles = useCallback(async () => {
         if (!hasMore || isLoading) return;
 
-        const key = cacheKey(offset, search);
+        const key = cacheKey(offset, search, source);
         const cached = cacheRef.current.get(key);
         if (cached) {
             if (cached.articles.length === 0) {
@@ -78,6 +79,7 @@ export function ArticleFeed({ initialArticles, search }: ArticleFeedProps) {
                 offset,
                 limit: PAGE_SIZE,
                 search,
+                source,
             });
 
             cacheRef.current.set(key, { articles: newArticles, hasMore: moreAvailable });
@@ -98,7 +100,7 @@ export function ArticleFeed({ initialArticles, search }: ArticleFeedProps) {
         } finally {
             setIsLoading(false);
         }
-    }, [offset, search, hasMore, isLoading]);
+    }, [offset, search, source, hasMore, isLoading]);
 
     useEffect(() => {
         if (!inView || !hasMore || isLoading) return;

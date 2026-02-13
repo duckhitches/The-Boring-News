@@ -1,14 +1,14 @@
 # Project Scan Report — Features & Optimizations
 
-Scan date: February 2026. This document lists suggested new features and optimizations for The Boring News. No code was changed; this is a roadmap only.
+Scan date: February 2026. Last re-scan: after source filter update. This document lists suggested new features and optimizations for The Boring News.
 
 ---
 
 ## 1. New Features
 
-### 1.1 Filter by source
-- **Current:** Backend supports `category` in `getArticles()` but there is no category filter in the UI. Categories are not populated in `db/seed.ts` or in the ingestor (`article_categories` is never inserted).
-- **Suggestion:** Add a **“Filter by source”** dropdown (e.g. TechCrunch, The Verge) using existing `sources` and a new query param (e.g. `?source=...`). Extend `getArticles()` to filter by `source_id` or source name. Quick win and reuses existing data.
+### 1.1 Filter by source — ✅ Done
+- **Implemented:** `SourceFilter` component (dropdown with ALL_SOURCES + source list), `getSources()` in `lib/actions.ts`, `getArticles({ source })` filtering by `s.name`. Home page uses `?source=...` and passes `source` into `ArticleFeed` so load-more respects the filter.
+- No further action.
 
 ### 1.2 Category filter (if you want categories)
 - **Current:** Schema has `categories` and `article_categories`; `lib/actions.ts` supports `category`; seed does not create categories; ingestor does not assign articles to categories.
@@ -76,28 +76,29 @@ Scan date: February 2026. This document lists suggested new features and optimiz
 
 ## 3. Summary Table
 
-| Area            | Suggestion                    | Effort  | Impact |
-|-----------------|-------------------------------|---------|--------|
-| Filter by source| Add dropdown + query param    | Low     | High   |
-| Categories      | Populate + filter or hide     | Medium  | Medium |
-| Sort (newest/oldest) | Query param + ORDER BY  | Low     | Low    |
-| Share article   | Copy link + share buttons     | Low     | Medium |
-| Reading time    | Estimate on card/modal        | Low     | Low    |
-| Aggregator RSS  | `/feed.xml` route             | Low     | Medium |
-| Theme toggle    | Header toggle + persistence   | Low     | Medium |
-| Keyboard shortcuts | / and j/k                  | Low     | Low    |
-| Sitemap         | Include article URLs          | Low     | SEO    |
-| Error boundary  | Wrap feed/content             | Low     | Robustness |
-| Ingest API      | Require secret when set       | Low     | Security |
-| Env docs        | List all env vars in README   | Low     | DX      |
+| Area            | Suggestion                    | Effort  | Impact | Status   |
+|-----------------|-------------------------------|---------|--------|----------|
+| Filter by source| Add dropdown + query param    | Low     | High   | **Done** |
+| Categories      | Populate + filter or hide     | Medium  | Medium | Pending  |
+| Sort (newest/oldest) | Query param + ORDER BY  | Low     | Low    | Pending  |
+| Share article   | Copy link + share buttons     | Low     | Medium | Pending  |
+| Reading time    | Estimate on card/modal        | Low     | Low    | Pending  |
+| Aggregator RSS  | `/feed.xml` route             | Low     | Medium | Pending  |
+| Theme toggle    | Header toggle + persistence   | Low     | Medium | Pending  |
+| Keyboard shortcuts | / and j/k                  | Low     | Low    | Pending  |
+| Sitemap         | Include article URLs          | Low     | SEO    | Pending  |
+| Error boundary  | Wrap feed/content             | Low     | Robustness | Pending |
+| Ingest API      | Require secret when set       | Low     | Security | Pending |
+| Env docs        | List all env vars in README   | Low     | DX      | Pending |
 
 ---
 
 ## 4. What’s Already in Good Shape
 
+- **Source filter:** Dropdown (SourceFilter) with `?source=...`, `getSources()`, `getArticles({ source })`; ArticleFeed passes `source` so load-more stays filtered.
 - RSS ingestion: parallel feeds, timeouts, retries, OG image scraping, Gemini summarization.
-- Caching: server-side `unstable_cache` for articles, client-side cache and throttle for infinite scroll.
-- UI: Search (debounced), infinite scroll, responsive cards, modal with AI summary, image fallback.
+- **Data freshness:** `revalidate = 0` and no `unstable_cache` on `getArticles()` so the feed is always fresh (good for demo; consider re-enabling ISR/cache for production traffic).
+- Client-side: cache and throttle for infinite scroll; search (debounced); responsive cards; modal with AI summary; image fallback.
 - API: `/api/ingest` and `/api/revalidate` with optional secret; revalidation after ingest.
 - Licensing and README: Dual licensing (BSL/MIT) and structure are clearly described.
 

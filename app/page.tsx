@@ -72,7 +72,7 @@ export default async function Home(props: Props) {
                  </p>
                </div>
              ) : (
-               <ArticleFeed initialArticles={articles} search={search} />
+               <ArticleFeed initialArticles={articles} search={search} source={source} />
              )}
           </section>
         </main>
