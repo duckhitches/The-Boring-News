@@ -60,7 +60,7 @@ export function ArticleImage({
   return (
     <div
       className={`relative w-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 ${
-        isCard ? 'aspect-video' : 'h-64 sm:h-72'
+        isCard ? 'aspect-video min-h-[8rem] sm:min-h-0' : 'h-full min-h-48 sm:min-h-64'
       } ${className}`}
     >
       {showImage ? (

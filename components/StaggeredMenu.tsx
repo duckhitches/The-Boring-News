@@ -7,6 +7,7 @@
 import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { gsap } from 'gsap';
+import { TRIGGER_REFRESH_NEWS_EVENT } from './RefreshNews';
 
 export interface StaggeredMenuItem {
   label: string;
@@ -499,7 +500,12 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                       href={it.link}
                       aria-label={it.ariaLabel}
                       data-index={idx + 1}
-                      onClick={closeMenu}
+                      onClick={() => {
+                        closeMenu();
+                        if (it.link === '/') {
+                          setTimeout(() => window.dispatchEvent(new CustomEvent(TRIGGER_REFRESH_NEWS_EVENT)), 350);
+                        }
+                      }}
                     >
                       <span className="sm-panel-itemLabel inline-block [transform-origin:50%_100%] will-change-transform">
                         {it.label}

@@ -9,32 +9,56 @@
 
 import { neon } from '@neondatabase/serverless';
 
-if (!process.env.DATABASE_URL) {
-    throw new Error('DATABASE_URL is not defined');
+const DATABASE_URL = process.env.DATABASE_URL;
+
+if (!DATABASE_URL?.trim()) {
+    throw new Error('DATABASE_URL is not defined. Set it in .env (e.g. from Neon dashboard).');
 }
 
-const sqlClient = neon(process.env.DATABASE_URL);
+function isConnectionError(err: unknown): boolean {
+    const msg = err instanceof Error ? err.message : String(err);
+    return (
+        msg.includes('fetch failed') ||
+        msg.includes('ECONNREFUSED') ||
+        msg.includes('ENOTFOUND') ||
+        msg.includes('ETIMEDOUT') ||
+        msg.includes('connect') ||
+        msg.includes('Connection') ||
+        (err as { code?: string })?.code === 'NEON_CONNECTION_ERROR'
+    );
+}
+
+const sqlClient = neon(DATABASE_URL);
+
+async function runQuery(text: string, values: any[]) {
+    try {
+        return await (sqlClient as any).query(text, values);
+    } catch (err) {
+        if (isConnectionError(err)) {
+            const hint =
+                'Check: (1) DATABASE_URL in .env is correct and starts with postgres:// or postgresql://, ' +
+                '(2) network access to Neon, (3) Neon project is not paused (unpause in Neon dashboard).';
+            throw new Error(
+                `Database connection failed: ${err instanceof Error ? err.message : String(err)}. ${hint}`,
+                { cause: err }
+            );
+        }
+        throw err;
+    }
+}
 
 // Wrapper to match previous usage: await sql`...` or await sql(text, ...params)
 export async function sql(strings: TemplateStringsArray | string, ...values: any[]) {
-    // If called as a function sql(string, ...values)
     if (typeof strings === 'string') {
-        const result = await (sqlClient as any).query(strings, values);
+        const result = await runQuery(strings, values);
         return { rows: result, rowCount: result.length };
     }
-
-    // We need to reconstruct the query from template strings and values
-    // reduce(callback, initialValue) - if no initial, takes first element.
-    // strings has N parts, values has N-1.
-    // e.g. sql`select * from t where id=${1}` -> strings=["select * from t where id=", ""], values=[1]
-
-    // We want: "select * from t where id=$1"
 
     let text = strings[0];
     for (let i = 1; i < strings.length; i++) {
         text += '$' + i + strings[i];
     }
 
-    const result = await (sqlClient as any).query(text, values);
+    const result = await runQuery(text, values);
     return { rows: result, rowCount: result.length };
 }

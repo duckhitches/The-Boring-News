@@ -46,7 +46,7 @@ export function SourceFilter({ sources }: SourceFilterProps) {
     <div className="relative group">
        <div className="absolute inset-0 bg-black dark:bg-white translate-x-1 translate-y-1 -z-10 group-hover:translate-x-0 group-hover:translate-y-0 transition-transform duration-75" />
        <select
-        className="appearance-none block w-full md:w-48 border-2 border-black dark:border-white py-2 pl-3 pr-8 text-sm bg-background focus:outline-none focus:ring-0 focus:bg-pink-50 dark:focus:bg-zinc-900 transition-none rounded-none uppercase tracking-wide cursor-pointer text-black dark:text-white"
+        className="appearance-none block w-full min-w-0 md:w-48 border-2 border-black dark:border-white py-2.5 sm:py-2 pl-3 pr-8 text-xs sm:text-sm min-h-[44px] sm:min-h-0 bg-background focus:outline-none focus:ring-0 focus:bg-pink-50 dark:focus:bg-zinc-900 transition-none rounded-none uppercase tracking-wide cursor-pointer text-black dark:text-white"
         onChange={(e) => handleSelect(e.target.value)}
         value={currentSource || ''}
         disabled={isPending}

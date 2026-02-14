@@ -24,14 +24,14 @@ export default function AboutPage() {
       <div className="relative z-10 flex flex-col min-h-screen">
         <Header />
         
-        <main className="container mx-auto px-4 py-12 max-w-4xl flex-1 flex flex-col gap-16">
+        <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-8 md:py-12 max-w-4xl flex-1 flex flex-col gap-10 sm:gap-16">
           
           {/* Header Block */}
-          <header className="border-b-4 border-black dark:border-white pb-8">
-            <h1 className="font-boldonse font-bold text-4xl sm:text-5xl md:text-7xl uppercase tracking-tighter mb-4 text-transparent bg-clip-text bg-gradient-to-b from-black to-zinc-500 dark:from-white dark:to-zinc-500 break-words">
+          <header className="border-b-4 border-black dark:border-white pb-6 sm:pb-8">
+            <h1 className="font-boldonse font-bold text-3xl sm:text-4xl md:text-5xl lg:text-7xl uppercase tracking-tighter mb-3 sm:mb-4 text-transparent bg-clip-text bg-gradient-to-b from-black to-zinc-500 dark:from-white dark:to-zinc-500 break-words">
               About_<br/><span className="text-pink-500">Project</span>
             </h1>
-            <p className="text-xl md:text-2xl font-bold uppercase tracking-widest text-zinc-500">
+            <p className="text-base sm:text-xl md:text-2xl font-bold uppercase tracking-widest text-zinc-500">
               // MANIFESTO_V1.0
             </p>
           </header>

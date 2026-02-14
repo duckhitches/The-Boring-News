@@ -118,34 +118,34 @@ export function ArticleFeed({ initialArticles, search, source }: ArticleFeedProp
 
     return (
         <div className="font-mono">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {articles.map((article) => (
                     <NewsCard key={article.id} article={article} />
                 ))}
             </div>
             
             {hasMore && (
-                <div ref={ref} className="flex justify-center p-12 mt-4">
-                    <div className="flex items-center gap-2 text-black dark:text-white uppercase font-bold tracking-widest animate-pulse">
-                        <div className="w-3 h-3 bg-pink-500" />
-                        LOADING_MORE_DATA...
+                <div ref={ref} className="flex justify-center p-6 sm:p-8 md:p-12 mt-4">
+                    <div className="flex items-center gap-2 text-black dark:text-white uppercase font-bold tracking-widest animate-pulse text-xs sm:text-sm">
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-pink-500" />
+                        <span className="truncate">LOADING_MORE_DATA...</span>
                     </div>
                 </div>
             )}
             
             {!hasMore && articles.length > 0 && (
-                <div className="text-center py-12 text-zinc-400 dark:text-zinc-600 font-bold uppercase tracking-widest border-t-2 border-dashed border-zinc-200 dark:border-zinc-800 mt-12">
+                <div className="text-center py-8 sm:py-12 text-zinc-400 dark:text-zinc-600 font-bold uppercase tracking-widest text-xs sm:text-sm border-t-2 border-dashed border-zinc-200 dark:border-zinc-800 mt-8 sm:mt-12 px-4">
                     [END_OF_STREAM]
                 </div>
             )}
              
             {articles.length === 0 && (
-                <div className="text-center py-32 flex flex-col items-center gap-4 text-zinc-500">
-                    <Terminal className="w-12 h-12 opacity-50" />
-                    <div className="font-bold uppercase tracking-widest text-lg">
+                <div className="text-center py-16 sm:py-24 md:py-32 flex flex-col items-center gap-3 sm:gap-4 text-zinc-500 px-4">
+                    <Terminal className="w-10 h-10 sm:w-12 sm:h-12 opacity-50" />
+                    <div className="font-bold uppercase tracking-widest text-sm sm:text-base md:text-lg">
                         NO_DATA_MATCHING_QUERY
                     </div>
-                    <div className="text-xs max-w-sm mx-auto opacity-70">
+                    <div className="text-[11px] sm:text-xs max-w-sm mx-auto opacity-70">
                         Try adjusting your search filters or check back later for new ingestion cycles.
                     </div>
                 </div>
